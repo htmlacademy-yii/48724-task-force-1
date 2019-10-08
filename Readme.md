@@ -1,7 +1,7 @@
 # Личный проект «TaskForce»
 
 * Студент: [Илья Молчанов](https://up.htmlacademy.ru/yii/1/user/48724).
-* Наставник: `Неизвестно`.
+* Наставник: [Сергей Парфенов](https://htmlacademy.ru/profile/id926645).
 
 ---
 
