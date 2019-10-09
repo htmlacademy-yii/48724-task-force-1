@@ -12,7 +12,7 @@ class Task
     private $roles = [];
     private $operations = [];
 
-    public $currentStatus = null
+    private $currentStatus = null;
     private $ownerId = null;
     private $workerId = null;
 
@@ -29,6 +29,11 @@ class Task
     public function getRoles()
     {
         return $this->roles;
+    }
+
+    public function getCurrentStatus()
+    {
+        return $this->currentStatus;
     }
 
     public function getNextStatus()
