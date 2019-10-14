@@ -12,22 +12,39 @@ class Task
     const STATUS_NEW = 'Новое';
     const STATUS_IN_WORK = 'Выполняется';
     const STATUS_COMPLETED = 'Завершено';
-    const STATUS_CANCEL = 'Отменено';
+    const STATUS_CANCELED = 'Отменено';
+    const STATUS_FAILED = 'Провалена';
+
+    const ACTION_BEGIN = 1;
+    const ACTION_START = 2;
+    const ACTION_END = 3;
+    const ACTION_FAIL = 98;
+    const ACTION_CANCEL = 99;
+
 
     protected $currentStatus;
 
     function __construct()
     {
 
-        $this->begin();
+        $this->setStatus(self::STATUS_NEW);
 
     }
 
+    private $relations = [
+        self::ACTION_BEGIN => self::STATUS_NEW,
+        self::ACTION_START => self::STATUS_IN_WORK,
+        self::ACTION_END => self::STATUS_COMPLETED,
+        self::ACTION_FAIL => self::STATUS_FAILED,
+        self::ACTION_CANCEL => self::STATUS_CANCELED,
+    ];
+
     private $map = [
-        self::STATUS_NEW => [self::STATUS_IN_WORK, self::STATUS_CANCEL],
-        self::STATUS_IN_WORK => [self::STATUS_COMPLETED, self::STATUS_CANCEL],
+        self::STATUS_NEW => [self::STATUS_IN_WORK, self::STATUS_CANCELED],
+        self::STATUS_IN_WORK => [self::STATUS_COMPLETED, self::STATUS_CANCELED, self::STATUS_FAILED],
+        self::STATUS_FAILED => null,
         self::STATUS_COMPLETED => null,
-        self::STATUS_CANCEL => null,
+        self::STATUS_CANCELED => null,
     ];
 
 
@@ -38,7 +55,7 @@ class Task
 
     }
 
-    public function canChange($newStatus)
+    private function canChange($newStatus)
     {
 
         $current = $this->getStatus();
@@ -55,7 +72,7 @@ class Task
     }
 
 
-    public function setStatus($newStatus)
+    private function setStatus($newStatus)
     {
 
         if ($this->canChange($newStatus)) {
@@ -69,32 +86,16 @@ class Task
 
     }
 
-    public function begin()
+    public function getNextStatus($action)
     {
+        if (isset($this->relations[$action])) {
 
-        $this->setStatus(self::STATUS_NEW);
+            return $this->relations[$action];
 
-    }
+        }
 
-    public function cancel()
-    {
-
-        $this->setStatus(self::STATUS_CANCEL);
-
-    }
-
-    public function start()
-    {
-
-        $this->setStatus(self::STATUS_IN_WORK);
-
-    }
-
-    public function complete()
-    {
-
-        $this->setStatus(self::STATUS_COMPLETED);
-
+        throw new \Exception("Неверный код действия");
+        return false;
     }
 
 }
