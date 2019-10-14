@@ -16,7 +16,8 @@ class Task
 
     protected $currentStatus;
 
-    function __construct(){
+    function __construct()
+    {
 
         $this->begin();
 
@@ -30,10 +31,11 @@ class Task
     ];
 
 
-
     public function getStatus()
     {
+
         return $this->currentStatus;
+
     }
 
     public function canChange($newStatus)
@@ -49,6 +51,7 @@ class Task
         $nextStatuses = $this->map[$current];
 
         return (!empty($nextStatuses) && in_array($newStatus, $nextStatuses));
+
     }
 
 
@@ -63,22 +66,35 @@ class Task
 
         echo 'Ошибка';
         return false;
+
     }
 
-    public function begin() {
+    public function begin()
+    {
+
         $this->setStatus(self::STATUS_NEW);
+
     }
 
-    public function cancel() {
+    public function cancel()
+    {
+
         $this->setStatus(self::STATUS_CANCEL);
+
     }
 
-    public function start() {
+    public function start()
+    {
+
         $this->setStatus(self::STATUS_IN_WORK);
+
     }
 
-    public function complete() {
+    public function complete()
+    {
+
         $this->setStatus(self::STATUS_COMPLETED);
+
     }
 
 }
