@@ -1,47 +1,40 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: plue
- * Date: 09.10.2019
- * Time: 20:20
- */
 
 class Task
 {
 
-    const STATUS_NEW = 'Новое';
-    const STATUS_IN_WORK = 'Выполняется';
+    const STATUS_CREATED = 'Новое';
+    const STATUS_STARTED = 'Выполняется';
     const STATUS_COMPLETED = 'Завершено';
     const STATUS_CANCELED = 'Отменено';
     const STATUS_FAILED = 'Провалена';
 
-    const ACTION_BEGIN = 1;
+    const ACTION_CREATE = 1;
     const ACTION_START = 2;
-    const ACTION_END = 3;
+    const ACTION_COMPLETE = 3;
     const ACTION_FAIL = 98;
     const ACTION_CANCEL = 99;
 
 
-    protected $currentStatus;
+    private $currentStatus;
 
     function __construct()
     {
-
-        $this->setStatus(self::STATUS_NEW);
+        $this->currentStatus = self::STATUS_CREATED;
 
     }
 
-    private $relations = [
-        self::ACTION_BEGIN => self::STATUS_NEW,
-        self::ACTION_START => self::STATUS_IN_WORK,
-        self::ACTION_END => self::STATUS_COMPLETED,
+    private const RELATIONS = [
+        self::ACTION_CREATE => self::STATUS_CREATED,
+        self::ACTION_START => self::STATUS_STARTED,
+        self::ACTION_COMPLETE => self::STATUS_COMPLETED,
         self::ACTION_FAIL => self::STATUS_FAILED,
         self::ACTION_CANCEL => self::STATUS_CANCELED,
     ];
 
-    private $map = [
-        self::STATUS_NEW => [self::STATUS_IN_WORK, self::STATUS_CANCELED],
-        self::STATUS_IN_WORK => [self::STATUS_COMPLETED, self::STATUS_CANCELED, self::STATUS_FAILED],
+    private const MAP = [
+        self::STATUS_CREATED => [self::STATUS_STARTED, self::STATUS_CANCELED],
+        self::STATUS_STARTED => [self::STATUS_COMPLETED, self::STATUS_CANCELED, self::STATUS_FAILED],
         self::STATUS_FAILED => null,
         self::STATUS_COMPLETED => null,
         self::STATUS_CANCELED => null,
@@ -58,14 +51,7 @@ class Task
     private function canChange($newStatus)
     {
 
-        $current = $this->getStatus();
-
-        // при создании, когда еще нет статуса
-        if (!$current && $newStatus === self::STATUS_NEW) {
-            return true;
-        }
-
-        $nextStatuses = $this->map[$current];
+        $nextStatuses = self::MAP[$this->currentStatus];
 
         return (!empty($nextStatuses) && in_array($newStatus, $nextStatuses));
 
@@ -75,33 +61,54 @@ class Task
     private function setStatus($newStatus)
     {
 
-        if ($this->canChange($newStatus)) {
+        if (!$this->canChange($newStatus)) {
 
-            $this->currentStatus = $newStatus;
-            return true;
+            throw new \Exception("Ошибка статуса " . $newStatus);
+
         }
 
-        echo 'Ошибка';
-        return false;
+
+        $this->currentStatus = $newStatus;
 
     }
 
     public function getNextStatus($action)
     {
-        if (isset($this->relations[$action])) {
+        if (isset(self::RELATIONS[$action])) {
 
-            return $this->relations[$action];
+            return self::RELATIONS[$action];
 
         }
 
-        throw new \Exception("Неверный код действия");
-        return false;
+        throw new \Exception("Неверный код действия " . $action);
+    }
+
+    public function start()
+    {
+
+        $this->setStatus(self::STATUS_STARTED);
+    }
+
+
+    public function complete()
+    {
+
+        $this->setStatus(self::STATUS_COMPLETED);
+    }
+
+    public function cancel()
+    {
+
+        $this->setStatus(self::STATUS_CANCELED);
+    }
+
+
+    public function fail()
+    {
+
+        $this->setStatus(self::STATUS_FAILED);
     }
 
 }
 
-$x = new Task();
-// echo $x->getStatus();
-// var_dump($x->getNextStatus($x::ACTION_START) == $x::STATUS_IN_WORK);
 
-var_dump(assert($x->getNextStatus($x::ACTION_CANCEL) == $x::STATUS_CANCELED, 'cancel action'));
