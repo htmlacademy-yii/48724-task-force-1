@@ -104,4 +104,4 @@ $x = new Task();
 // echo $x->getStatus();
 // var_dump($x->getNextStatus($x::ACTION_START) == $x::STATUS_IN_WORK);
 
-var_dump(assert($x->getNextStatus($x::ACTION_CANCELsdf) == $x::STATUS_CANCELED, 'cancel action'));
+var_dump(assert($x->getNextStatus($x::ACTION_CANCEL) == $x::STATUS_CANCELED, 'cancel action'));
