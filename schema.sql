@@ -47,7 +47,7 @@ CREATE TABLE files(
 -- Связи:
 -- пользователь;
 -- задание;
-CREATE TABLE comments(
+CREATE TABLE user_comments(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	dt_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	comment TEXT NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE comments(
 -- Связи:
 -- текущий пользователь;
 -- пользователь - собеседник;
-CREATE TABLE messages(
+CREATE TABLE user_messages(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	dt_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	message TEXT NOT NULL,
@@ -76,10 +76,21 @@ CREATE TABLE messages(
 -- Связи:
 -- текщий пользователь;
 -- Полтзователь в избранном;
-CREATE TABLE favourites(
+CREATE TABLE user_favourites(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	id_current_user INT,
 	id_user INT
+);
+
+-- Связи категорий и пользователя:
+
+-- Связи:
+-- польщователь
+-- категория
+CREATE TABLE user_categories(
+	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
+	id_user INT,
+	id_category INT,
 );
 
 
@@ -116,13 +127,9 @@ CREATE TABLE users(
 	messenger VARCHAR(128) UNIQUE,
 	id_city INT,
 	is_author BOOLEAN DEFAULT FALSE,
-
-	-- 	??
-	categories_list,
-	tasks_list,
-	files_list,
-	favorites_list,
 );
+
+
 
 
 -- Задание - Центральная сущность всего сайта:
@@ -135,10 +142,9 @@ CREATE TABLE users(
 -- локация (город , координаты??? )
 
 -- Связи:
--- автор — пользователь, создавший задание;
+-- автор —  юзер, создавший задание;
 -- исполнитель — пользователь, выбпавший задание;
 -- категория — категория объявления;
--- файлы задания
 CREATE TABLE tasks(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	dt_add TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -146,8 +152,8 @@ CREATE TABLE tasks(
 	label VARCHAR(128) NOT NULL,
 	description TEXT,
 	price INT,
+-- 	как лучше сделать локацию задания??
 	location VARCHAR(128),
-
 	id_author INT ,
 	id_user INT,
 	id_category INT
