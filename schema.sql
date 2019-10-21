@@ -15,6 +15,7 @@ CREATE TABLE categories(
 	name VARCHAR(32) UNIQUE
 );
 
+
 -- Города:
 -- id
 -- city
@@ -22,6 +23,7 @@ CREATE TABLE cities(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	city VARCHAR(32) UNIQUE
 );
+
 
 -- Файлы:
 -- путь к файлу
@@ -53,6 +55,7 @@ CREATE TABLE comments(
 	id_task INT
 );
 
+
 -- Переписка:
 -- дата — дата и время размещения коммента;
 -- сообщение;
@@ -73,14 +76,11 @@ CREATE TABLE messages(
 -- Связи:
 -- текщий пользователь;
 -- Полтзователь в избранном;
-
 CREATE TABLE favourites(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	id_current_user INT,
 	id_user INT
 );
-
-
 
 
 -- Представляет зарегистрированного пользователя.:
@@ -95,7 +95,6 @@ CREATE TABLE favourites(
 -- skype (сделал уникальным);
 -- messenger (сделал уникальным);
 --что заказчик(bool)
-
 
 -- Связи:
 -- город
@@ -126,7 +125,6 @@ CREATE TABLE users(
 );
 
 
-
 -- Задание - Центральная сущность всего сайта:
 
 -- дата создания — дата и время, когда создано
@@ -135,8 +133,6 @@ CREATE TABLE users(
 -- подробное описание — задается пользователем;
 -- цена;
 -- локация (город , координаты??? )
-
-
 
 -- Связи:
 -- автор — пользователь, создавший задание;
@@ -158,13 +154,6 @@ CREATE TABLE tasks(
 );
 
 
-
-
-
-
-
-
-
 -- !!! Другие варианты установки связей и индексов:
 
 -- Указываем (создаем уникальный индекс) что email - это уникальное значение
@@ -180,13 +169,9 @@ CREATE INDEX l_user_commnt_id_index ON comments(id_user);
 
 
 
-
 -- FOREING KEYS (показывает привязки столбцов таблиц как правило к Primary Key  - lots.user_id = user.id)
-
-
 ALTER TABLE tasks
   ADD CONSTRAINT tasks_category_id__fk
 FOREIGN KEY (id_category) REFERENCES categories (id);
-
 
 -- ...
