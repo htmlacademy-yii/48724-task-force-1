@@ -6,31 +6,6 @@ CREATE DATABASE taskforce
 
 USE taskforce;
 
-
-
--- Представляет зарегистрированного пользователя.:
-
--- дата регистрации — дата и время, когда этот пользователь завёл аккаунт;
--- email;
--- имя;
--- др
--- пароль — хэшированный пароль пользователя;
--- аватарка;
--- полный адрес;
--- информация о себе;
--- телефон
--- skype (сделал уникальным);
--- messenger (сделал уникальным);
--- счетчик просмотров
--- показывать комменты только заказчику
-
--- Связи:
--- город
--- категории
--- задания
--- переписки
--- файлы
--- избранное
 CREATE TABLE users(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	dt_create DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -50,21 +25,6 @@ CREATE TABLE users(
 );
 
 
--- Задание - Центральная сущность всего сайта:
-
--- дата создания — дата и время, когда создано
--- дата завершения;
--- срок исполнения
--- кратное название — задается пользователем;
--- подробное описание — задается пользователем;
--- категория
--- цена;
--- локация (город , координаты )
-
--- Связи:
--- автор —  юзер, создавший задание;
--- исполнитель — пользователь, выбпавший задание;
--- категория — категория объявления;
 CREATE TABLE tasks(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	dt_create DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -80,9 +40,7 @@ CREATE TABLE tasks(
 	executer_id INT
 );
 
--- Локация (координаты):
--- lat
--- lon
+
 CREATE TABLE locations(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	lat DECIMAL(10, 8),
@@ -90,56 +48,36 @@ CREATE TABLE locations(
 );
 
 
-
--- КАТЕГОРИЯ:
--- id
--- имя
 CREATE TABLE categories(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	name VARCHAR(32) UNIQUE
 );
 
 
--- Города:
--- id
--- city
 CREATE TABLE cities(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
-	city VARCHAR(32) UNIQUE
+	name VARCHAR(32) UNIQUE
 );
 
-
--- Файлы:
--- путь к файлу
-
--- Связи:
--- задание - к какому заданию относятся;
--- ползователь - или к какому пользователю;
 
 CREATE TABLE files(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	path VARCHAR(128) NOT NULL
 );
 
--- Файлы пользователя:
+
 CREATE TABLE user_files(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	user_id INT
 );
 
--- Файлы заданий:
+
 CREATE TABLE task_files(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	task_id INT
 );
 
 
--- Отклики:
--- дата — дата и время размещения коммента;
--- сам отклик;
--- оценка
--- пользователь;
--- задание;
 CREATE TABLE user_reviews(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	dt_create DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -150,13 +88,6 @@ CREATE TABLE user_reviews(
 );
 
 
--- Переписка:
--- дата — дата и время размещения коммента;
--- сообщение;
--- отправитель
--- получатель
--- просмотрено ли сообшение
-
 CREATE TABLE user_messages(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	dt_create DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -166,29 +97,21 @@ CREATE TABLE user_messages(
 	viewed TINYINT DEFAULT 0
 );
 
--- Избранное:
 
--- Связи:
--- текщий пользователь;
--- Полтзователь в избранном;
 CREATE TABLE user_favorites(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	owner_id INT,
 	favorite_user_id INT
 );
 
--- Связи категорий и пользователя:
 
--- Связи:
--- польщователь
--- категория
 CREATE TABLE user_categories(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	user_id INT,
 	category_id INT
 );
 
---  Таблица уведомлений:
+
 CREATE TABLE user_notifications(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
 	user_id INT,
@@ -198,35 +121,81 @@ CREATE TABLE user_notifications(
 );
 
 
-
-
--- !!! Другие варианты установки связей и индексов:
-
--- Указываем (создаем уникальный индекс) что email - это уникальное значение
-CREATE UNIQUE INDEX users_email_uindex ON users (email);
+-- Уникальные ключи:
+CREATE UNIQUE INDEX users_email_uindex ON users(email);
+CREATE UNIQUE INDEX cities_name_uindex ON cities(name);
 CREATE UNIQUE INDEX categories_name_uindex ON categories(name);
-CREATE UNIQUE INDEX cities_name_uindex ON cities (name);
-
--- верно
+-- одна категория у юзера
 CREATE UNIQUE INDEX user_categories_user_id_category_id_uindex ON user_categories (user_id, category_id);
 
--- простые индексы (для ускорения выбрки и работы БД)
-CREATE INDEX l_category_id_index ON tasks(category_id);
 
-
--- добавить уникальные ключи
-
+-- Простые индексы (для сортировки и ускорения выбрки и работы БД)
+CREATE INDEX tasks_category_id_index ON tasks(category_id);
+CREATE INDEX user_reviews_dt_create_id_index ON user_reviews(dt_create);
+CREATE INDEX user_messages_dt_create_id_index ON user_messages(dt_create);
+CREATE INDEX tasks_dt_create_id_index ON tasks(dt_create);
 
 
 -- FOREING KEYS (показывает привязки столбцов таблиц как правило к Primary Key  - lots.user_id = user.id)
+ALTER TABLE users
+  ADD CONSTRAINT users_city_id__fk
+FOREIGN KEY (city_id) REFERENCES cities (id);
+
+ALTER TABLE tasks
+  ADD CONSTRAINT tasks_city_id__fk
+FOREIGN KEY (city_id) REFERENCES cities (id);
+
 ALTER TABLE tasks
   ADD CONSTRAINT tasks_category_id__fk
-FOREIGN KEY (id_category) REFERENCES categories (id);
+FOREIGN KEY (category_id) REFERENCES categories (id);
 
-ALTER TABLE user_categories
-   ADD UNIQUE (category_id) (`имяПоля1`, `имяПоля2`, ...);
+ALTER TABLE tasks
+  ADD CONSTRAINT tasks_location_id__fk
+FOREIGN KEY (location_id) REFERENCES locations (id);
 
--- ...
+ALTER TABLE tasks
+  ADD CONSTRAINT tasks_customer_id__fk
+FOREIGN KEY (customer_id) REFERENCES users (id);
 
-ALTER TABLE `имяТаблицы`
-   ADD UNIQUE `имяИндекса` (`имяПоля1`, `имяПоля2`, ...);
+ALTER TABLE tasks
+  ADD CONSTRAINT tasks_executer_id__fk
+FOREIGN KEY (executer_id) REFERENCES users (id);
+
+ALTER TABLE user_files
+  ADD CONSTRAINT user_files_user_id__fk
+FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE task_files
+  ADD CONSTRAINT task_files_user_id__fk
+FOREIGN KEY (task_id) REFERENCES tasks (id);
+
+ALTER TABLE user_reviews
+  ADD CONSTRAINT user_reviews_user_id__fk
+FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE user_reviews
+  ADD CONSTRAINT user_reviews_task_id__fk
+FOREIGN KEY (task_id) REFERENCES tasks (id);
+
+ALTER TABLE user_messages
+  ADD CONSTRAINT user_messages_sender_id__fk
+FOREIGN KEY (sender_id) REFERENCES users (id);
+
+ALTER TABLE user_messages
+  ADD CONSTRAINT user_messages_recipient_id__fk
+FOREIGN KEY (recipient_id) REFERENCES users (id);
+
+ALTER TABLE user_favorites
+  ADD CONSTRAINT user_favorites_owner_id__fk
+FOREIGN KEY (owner_id) REFERENCES users (id);
+
+ALTER TABLE user_favorites
+  ADD CONSTRAINT user_favorites_favorite_user_id__fk
+FOREIGN KEY (favorite_user_id) REFERENCES users (id);
+
+ALTER TABLE user_notifications
+  ADD CONSTRAINT user_notifications_user_id__fk
+FOREIGN KEY (user_id) REFERENCES users (id);
+
+
+
