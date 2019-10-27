@@ -75,7 +75,8 @@ CREATE TABLE user_files(
 
 CREATE TABLE task_files(
 	id INT PRIMARY KEY UNSIGNED AUTO_INCREMENT,
-	task_id INT
+	task_id INT,
+  file_id INT
 );
 
 
@@ -172,7 +173,11 @@ FOREIGN KEY (file_id) REFERENCES files (id);
 
 ALTER TABLE task_files
   ADD CONSTRAINT task_files_user_id__fk
-FOREIGN KEY (task_id) REFERENCES tasks (id);
+FOREIGN KEY (file_id) REFERENCES tasks (id);
+
+ALTER TABLE task_files
+  ADD CONSTRAINT task_files_file_id__fk
+FOREIGN KEY (task_id) REFERENCES files (id);
 
 ALTER TABLE user_reviews
   ADD CONSTRAINT user_reviews_user_id__fk
