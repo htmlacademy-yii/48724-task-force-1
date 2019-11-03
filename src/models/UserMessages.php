@@ -2,33 +2,26 @@
 /**
  * Created by IntelliJ IDEA.
  * User: plue
- * Date: 27/10/2019
- * Time: 20:51
+ * Date: 03/11/2019
+ * Time: 18:46
  */
 
 namespace App\models;
 
 
-class UserCategory
+class UserMessages
 {
-    private $id;
-    private $user_id;
-    private $category_id;
-
     public function validate()
     {
 
     }
 
-    public function loadData($user_id)
-    {
-
-    }
 
     public function save()
     {
 
     }
+
 
 
 }

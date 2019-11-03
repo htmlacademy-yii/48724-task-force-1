@@ -67,4 +67,11 @@ class Task
 
     }
 
+
+    /**
+     * Получаем в БД задачи принадлежащие категории
+     * @param $category_id
+     */
+    public function getByCategoryId($category_id){}
+
 }
