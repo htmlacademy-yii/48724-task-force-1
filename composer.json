@@ -1,16 +1,17 @@
 {
-    "name": "plue/48724-task-force-1",
-    "type": "project",
-    "authors": [
-        {
-            "name": "Molchanov Ilia",
-            "email": "plue@inbox.ru"
-        }
-    ],
-    "require": {},
-    "autoload": {
-      "psr-4": {
-        "App\\": "src/"
-      }
+  "name": "plue/48724-task-force-1",
+  "type": "project",
+  "authors": [
+    {
+      "name": "Molchanov Ilia",
+      "email": "plue@inbox.ru"
     }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  }
 }
+
