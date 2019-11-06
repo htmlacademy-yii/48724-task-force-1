@@ -22,6 +22,12 @@ class ActionFail extends AbstractAction
     static public function verify(Task $task, int $initiatorId) : bool
     {
 
+        if ($task -> getStatus() != 'Выполняетcя') {
+
+            return false;
+
+        }
+
         return $task -> getCustomerId() === $initiatorId;
 
     }

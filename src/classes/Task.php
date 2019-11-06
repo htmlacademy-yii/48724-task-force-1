@@ -110,12 +110,40 @@ class Task
         $this->setStatus(self::STATUS_FAILED);
     }
 
-    public function getAvailibleActions($initiatorId){
+    public function getAvailibleActions($task, $initiatorId)
+    {
 
         $availibleActions = [];
 
-        // вызывать каждый экшн и вызвать action::verify() // bool
-        // если true , $availibleActions[] = action::getName();
+        if (ActionCreate::verify($task, $initiatorId)) {
+
+            $availibleActions[] = ActionCreate::getName();
+
+        }
+
+        if (ActionStart::verify($task, $initiatorId)) {
+
+            $availibleActions[] = ActionStart::getName();
+
+        }
+
+        if (ActionComplete::verify($task, $initiatorId)) {
+
+            $availibleActions[] = ActionComplete::getName();
+
+        }
+
+        if (ActionCancel::verify($task, $initiatorId)) {
+
+            $availibleActions[] = ActionCancel::getName();
+
+        }
+
+        if (ActionFail::verify($task, $initiatorId)) {
+
+            $availibleActions[] = ActionFail::getName();
+
+        }
 
         return $availibleActions;
     }
@@ -123,7 +151,7 @@ class Task
     public function getCustomerId()
     {
 
-        return $this -> customer_id;
+        return $this->customer_id;
 
     }
 
