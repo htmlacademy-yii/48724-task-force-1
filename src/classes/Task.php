@@ -10,7 +10,6 @@ use App\classes\actions\ActionFail;
 
 class Task
 {
-
     const STATUS_CREATED = 'Новое';
     const STATUS_STARTED = 'Выполняется';
     const STATUS_COMPLETED = 'Завершено';
@@ -37,42 +36,32 @@ class Task
     private $currentStatus;
     private $customer_id;
 
-    function __construct($id)
+    function __construct($customer_id)
     {
         $this->currentStatus = self::STATUS_CREATED;
-        $this->customer_id = $id;
-
+        $this->customer_id = $customer_id;
     }
 
 
     public function getStatus()
     {
-
         return $this->currentStatus;
-
     }
 
     private function setStatus($newStatus)
     {
-
         if (!$this->canChange($newStatus)) {
-
             throw new \Exception("Ошибка статуса " . $newStatus);
-
         }
 
-
         $this->currentStatus = $newStatus;
-
     }
 
     private function canChange($newStatus)
     {
-
         $nextStatuses = self::ACTIONS[$this->currentStatus];
 
         return (!empty($nextStatuses) && in_array($newStatus, $nextStatuses));
-
     }
 
     public function getNextStatus($actionClass)
@@ -88,61 +77,46 @@ class Task
 
     public function start()
     {
-
         $this->setStatus(self::STATUS_STARTED);
     }
 
     public function complete()
     {
-
         $this->setStatus(self::STATUS_COMPLETED);
     }
 
     public function cancel()
     {
-
         $this->setStatus(self::STATUS_CANCELED);
     }
 
     public function fail()
     {
-
         $this->setStatus(self::STATUS_FAILED);
     }
 
     public function getAvailibleActions($task, $initiatorId)
     {
-
         $availibleActions = [];
 
         if (ActionCreate::verify($task, $initiatorId)) {
-
             $availibleActions[] = ActionCreate::getName();
-
         }
 
         if (ActionStart::verify($task, $initiatorId)) {
-
             $availibleActions[] = ActionStart::getName();
-
         }
 
         if (ActionComplete::verify($task, $initiatorId)) {
-
             $availibleActions[] = ActionComplete::getName();
-
         }
 
         if (ActionCancel::verify($task, $initiatorId)) {
-
             $availibleActions[] = ActionCancel::getName();
-
         }
 
         if (ActionFail::verify($task, $initiatorId)) {
-
             $availibleActions[] = ActionFail::getName();
-
         }
 
         return $availibleActions;
@@ -150,9 +124,7 @@ class Task
 
     public function getCustomerId()
     {
-
         return $this->customer_id;
-
     }
 
 }
