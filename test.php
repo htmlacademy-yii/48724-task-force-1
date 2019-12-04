@@ -1,19 +1,27 @@
 <?php
 
 use App\classes\Task;
+use App\classes\actions\ActionCreate;
+use App\classes\actions\ActionStart;
+use App\classes\actions\ActionCancel;
+use App\classes\actions\ActionComplete;
+use App\classes\actions\ActionFail;
+
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-$task = new Task();
+$task = new Task(1);
 
 $task->start();
 $task->complete();
 $status = $task->getStatus();
+assert($status === ActionComplete::getName(), 'Возвращает статус завершено');
 
-assert($status === Task::STATUS_COMPLETED, 'Возвращает статус завершено');
 
-assert($task->getNextStatus(Task::ACTION_CREATE) === Task::STATUS_CREATED, 'При создании задачи возвращается корректный статус');
-assert($task->getNextStatus(Task::ACTION_START) === Task::STATUS_STARTED, 'При начале выполнения задачи возвращается корректный статус');
-assert($task->getNextStatus(Task::ACTION_CANCEL) === Task::STATUS_CANCELED, 'При отмене задачи возвращается корректный статус');
-assert($task->getNextStatus(Task::ACTION_COMPLETE) === Task::STATUS_COMPLETED, 'При завершении задачи возвращается корректный статусП');
-assert($task->getNextStatus(Task::ACTION_FAIL) === Task::STATUS_FAILED, 'При провале задачи возвращается корректный статус');
+
+//
+//assert($task->getNextStatus(ActionCreate) === ActionCreate::STATUS, 'При создании задачи возвращается корректный статус');
+//assert($task->getNextStatus(ActionStart) === ActionStart::STATUS, 'При начале выполнения задачи возвращается корректный статус');
+//assert($task->getNextStatus(ActionCancel) === ActionCancel::STATUS, 'При отмене задачи возвращается корректный статус');
+//assert($task->getNextStatus(ActionComplete) === Task::STATUS, 'При завершении задачи возвращается корректный статусП');
+//assert($task->getNextStatus(ActionFail) === ActionFail::STATUS, 'При провале задачи возвращается корректный статус');

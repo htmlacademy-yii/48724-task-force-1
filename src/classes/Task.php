@@ -2,113 +2,129 @@
 
 namespace App\classes;
 
+use App\classes\actions\ActionCreate;
+use App\classes\actions\ActionStart;
+use App\classes\actions\ActionCancel;
+use App\classes\actions\ActionComplete;
+use App\classes\actions\ActionFail;
+
 class Task
 {
-
     const STATUS_CREATED = 'Новое';
     const STATUS_STARTED = 'Выполняется';
     const STATUS_COMPLETED = 'Завершено';
     const STATUS_CANCELED = 'Отменено';
     const STATUS_FAILED = 'Провалена';
 
-    const ACTION_CREATE = 1;
-    const ACTION_START = 2;
-    const ACTION_COMPLETE = 3;
-    const ACTION_FAIL = 98;
-    const ACTION_CANCEL = 99;
+    private const ACTIONS = [
+        ActionCreate::class => [ActionStart::class, ActionCancel::class],
+        ActionStart::class => [ActionComplete::class, ActionCancel::class, ActionFail::class],
+        ActionCancel::class => null,
+        ActionComplete::class => null,
+        ActionFail::class => null,
+    ];
+
+    private const RELATIONS = [
+        ActionCreate::class => self::STATUS_CREATED,
+        ActionStart::class => self::STATUS_STARTED,
+        ActionCancel::class => self::STATUS_CANCELED,
+        ActionComplete::class => self::STATUS_COMPLETED,
+        ActionFail::class => self::STATUS_FAILED,
+    ];
 
 
     private $currentStatus;
+    private $customer_id;
 
-    function __construct()
+    function __construct($customer_id)
     {
         $this->currentStatus = self::STATUS_CREATED;
-
+        $this->customer_id = $customer_id;
     }
-
-    private const RELATIONS = [
-        self::ACTION_CREATE => self::STATUS_CREATED,
-        self::ACTION_START => self::STATUS_STARTED,
-        self::ACTION_COMPLETE => self::STATUS_COMPLETED,
-        self::ACTION_FAIL => self::STATUS_FAILED,
-        self::ACTION_CANCEL => self::STATUS_CANCELED,
-    ];
-
-    private const MAP = [
-        self::STATUS_CREATED => [self::STATUS_STARTED, self::STATUS_CANCELED],
-        self::STATUS_STARTED => [self::STATUS_COMPLETED, self::STATUS_CANCELED, self::STATUS_FAILED],
-        self::STATUS_FAILED => null,
-        self::STATUS_COMPLETED => null,
-        self::STATUS_CANCELED => null,
-    ];
 
 
     public function getStatus()
     {
-
         return $this->currentStatus;
+    }
 
+    private function setStatus($newStatus)
+    {
+        if (!$this->canChange($newStatus)) {
+            throw new \Exception("Ошибка статуса " . $newStatus);
+        }
+
+        $this->currentStatus = $newStatus;
     }
 
     private function canChange($newStatus)
     {
-
-        $nextStatuses = self::MAP[$this->currentStatus];
+        $nextStatuses = self::ACTIONS[$this->currentStatus];
 
         return (!empty($nextStatuses) && in_array($newStatus, $nextStatuses));
-
     }
 
-
-    private function setStatus($newStatus)
+    public function getNextStatus($actionClass)
     {
+        if (isset(self::RELATIONS[$actionClass])) {
 
-        if (!$this->canChange($newStatus)) {
-
-            throw new \Exception("Ошибка статуса " . $newStatus);
+            return self::RELATIONS[$actionClass];
 
         }
 
-
-        $this->currentStatus = $newStatus;
-
-    }
-
-    public function getNextStatus($action)
-    {
-        if (isset(self::RELATIONS[$action])) {
-
-            return self::RELATIONS[$action];
-
-        }
-
-        throw new \Exception("Неверный код действия " . $action);
+        throw new \Exception("Неверный экшн " . $actionClass);
     }
 
     public function start()
     {
-
         $this->setStatus(self::STATUS_STARTED);
     }
 
-
     public function complete()
     {
-
         $this->setStatus(self::STATUS_COMPLETED);
     }
 
     public function cancel()
     {
-
         $this->setStatus(self::STATUS_CANCELED);
     }
 
-
     public function fail()
     {
-
         $this->setStatus(self::STATUS_FAILED);
+    }
+
+    public function getAvailibleActions($task, $initiatorId)
+    {
+        $availibleActions = [];
+
+        if (ActionCreate::verify($task, $initiatorId)) {
+            $availibleActions[] = ActionCreate::getName();
+        }
+
+        if (ActionStart::verify($task, $initiatorId)) {
+            $availibleActions[] = ActionStart::getName();
+        }
+
+        if (ActionComplete::verify($task, $initiatorId)) {
+            $availibleActions[] = ActionComplete::getName();
+        }
+
+        if (ActionCancel::verify($task, $initiatorId)) {
+            $availibleActions[] = ActionCancel::getName();
+        }
+
+        if (ActionFail::verify($task, $initiatorId)) {
+            $availibleActions[] = ActionFail::getName();
+        }
+
+        return $availibleActions;
+    }
+
+    public function getCustomerId()
+    {
+        return $this->customer_id;
     }
 
 }
